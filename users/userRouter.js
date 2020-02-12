@@ -33,12 +33,24 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", (req, res) => {
-  // do your magic!
+router.get("/:id", validateUserId, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await userDB.getById(id);
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: "server error :(" });
+  }
 });
 
-router.get("/:id/posts", (req, res) => {
-  // do your magic!
+router.get("/:id/posts", validateUserId, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const userPosts = await userDB.getUserPosts(id);
+    res.status(200).json(userPosts);
+  } catch (error) {
+    res.status(500).json({ error: "server error :(" });
+  }
 });
 
 router.delete("/:id", (req, res) => {
