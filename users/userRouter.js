@@ -53,12 +53,28 @@ router.get("/:id/posts", validateUserId, async (req, res) => {
   }
 });
 
-router.delete("/:id", (req, res) => {
-  // do your magic!
+router.delete("/:id", validateUserId, async (req, res) => {
+  const { id } = req.params;
+  try {
+    await userDB.remove(id);
+    res.status(200).send("successfully deleted user.");
+  } catch (error) {
+    res.status(500).json({ error: "server error :(" });
+  }
 });
 
-router.put("/:id", (req, res) => {
-  // do your magic!
+router.put("/:id", validateUserId, validateUser, async (req, res) => {
+  const {
+    body,
+    params: { id }
+  } = req;
+  await userDB.update(id, body);
+  const updatedUser = await userDB.getById(id);
+  res.status(201).json(updatedUser);
+  try {
+  } catch (error) {
+    res.status(500).json({ error: "server error :(" });
+  }
 });
 
 //custom middleware
