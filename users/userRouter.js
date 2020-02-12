@@ -13,7 +13,7 @@ router.post("/", validateUser, async (req, res) => {
   }
 });
 
-router.post("/:id/posts", validatePost, async (req, res) => {
+router.post("/:id/posts", validateUserId, validatePost, async (req, res) => {
   const { id } = req.params;
   try {
     const payload = { ...req.body, user_id: id };
@@ -51,20 +51,19 @@ router.put("/:id", (req, res) => {
 
 //custom middleware
 
-function validateUserId(id) {
-  return async function(req, res, next) {
-    try {
-      const user = await userDB.getById(id);
-      if (!user.length) {
-        res.status(400).json({ message: "invalid user id" });
-      } else {
-        req.user = user;
-      }
-    } catch (error) {
-      console.error(error);
+async function validateUserId(req, res, next) {
+  const { id } = req.params;
+  try {
+    const user = await userDB.getById(id);
+    if (!user) {
+      res.status(400).json({ message: "invalid user id" });
+    } else {
+      req.user = user;
     }
-    next();
-  };
+  } catch (error) {
+    console.error(error);
+  }
+  next();
 }
 
 function validateUser(req, res, next) {
